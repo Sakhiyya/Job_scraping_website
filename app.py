@@ -17,6 +17,13 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
+# ✅ Force HTTPS redirect
+@app.before_request
+def before_request():
+    if request.url.startswith('http://'):
+        url = request.url.replace('http://', 'https://', 1)
+        return redirect(url, code=301)
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -156,7 +163,7 @@ def remove_job(job_id):
     flash("Job removed from saved list.")
     return redirect(url_for('saved_jobs'))
 
-# ✅ Scheduler setup
+# ✅ Scheduler setup for web scraping
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=collect_and_save_jobs, trigger="interval", days=1)  # Run daily
 scheduler.start()
@@ -166,7 +173,5 @@ import atexit
 atexit.register(lambda: scheduler.shutdown())
 
 if __name__ == '__main__':
-    import os
-    port = int(os.environ.get("PORT", 10000))  # default to 10000 if not on Render
+    port = int(os.environ.get("PORT", 10000))  # default to 10000 for local or fallback
     app.run(host='0.0.0.0', port=port)
-
