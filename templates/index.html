@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}CareerCompass Dashboard{% endblock %}
+
+{% block content %}
+{% if suggestions %}
+<div class="career-suggestions">
+    <h3>Career Suggestions Based on Your CV:</h3>
+    <ul>
+        {% for suggestion in suggestions %}
+        <li>{{ suggestion }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<div style="display: flex; gap: 20px;">
+    <!-- Sidebar filter -->
+    <div style="min-width: 250px;">
+        <h3>Filter Jobs</h3>
+        <form method="get" action="{{ url_for('index') }}">
+            <label for="job_title">Job Title:</label><br>
+            <select id="job_title" name="job_title" style="width:100%; padding:8px;">
+                <option value="">-- All Job Titles --</option>
+                {% for title in job_titles %}
+                <option value="{{ title }}" {% if selected_job_title == title %}selected{% endif %}>{{ title }}</option>
+                {% endfor %}
+            </select><br><br>
+
+            <label for="location">Location:</label><br>
+            <select id="location" name="location" style="width:100%; padding:8px;">
+                <option value="">-- All Locations --</option>
+                {% for loc in locations %}
+                <option value="{{ loc }}" {% if selected_location == loc %}selected{% endif %}>{{ loc }}</option>
+                {% endfor %}
+            </select><br><br>
+
+            <button type="submit" class="btn">Apply Filters</button>
+        </form>
+    </div>
+
+    <!-- Main job listings -->
+    <div class="container">
+        {% if jobs %}
+            {% for job in jobs %}
+                <div class="card">
+                    <h2>{{ job.Job_Title }}</h2>
+                    <p><strong>Company:</strong> {{ job.Company }}</p>
+                    <p><strong>Location:</strong> {{ job.Job_Location }}</p>
+                    <p><strong>Salary:</strong> {{ job.Job_Salary }}</p>
+                    <p><strong>Date Posted:</strong> {{ job['Date Posted'] }}</p>
+                    <p><strong>Closing Date:</strong> {{ job['Closing Date'] }}</p>
+
+                    <form action="{{ url_for('save_job') }}" method="post" style="margin-top: 10px;">
+                        <input type="hidden" name="job_id" value="{{ loop.index }}">
+                        <input type="hidden" name="job_title" value="{{ job.Job_Title }}">
+                        <input type="hidden" name="company" value="{{ job.Company }}">
+                        <button type="submit" class="btn-save">Save Job</button>
+                    </form>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No jobs found for your selected filters.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

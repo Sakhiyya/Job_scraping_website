@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Upload CV – CareerCompass{% endblock %}
+
+{% block content %}
+<div class="upload-box">
+    <h2>Upload Your CV</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="cv" accept=".pdf,.docx" required />
+        <button type="submit">Check My CV</button>
+    </form>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    {% if feedback %}
+        <h3 class="feedback-title">CV Feedback</h3>
+        <ul>
+            {% for item in feedback %}
+                <li>{{ item }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <div class="cv-gallery-section">
+        <h3 class="cv-gallery-title">Example CV Templates</h3>
+        <div class="cv-template-grid">
+            {% for i in range(1, 4) %}
+            <div class="cv-template-card">
+                <a href="{{ url_for('static', filename='cv_templates/template' ~ i ~ '.jpg') }}" target="_blank">
+                    <img src="{{ url_for('static', filename='cv_templates/template' ~ i ~ '.jpg') }}" alt="Template {{ i }}" class="cv-template-img" />
+                </a>
+                <p class="cv-caption">
+                    {% if i == 1 %}Student CV{% elif i == 2 %}Professional CV{% else %}Creative CV{% endif %}
+                </p>
+                <a href="{{ url_for('static', filename='cv_templates/template' ~ i ~ '.jpg') }}" download class="download-btn">Download</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="back">
+        <a href="{{ url_for('index') }}">← Back to Job Listings</a>
+    </div>
+</div>
+{% endblock %}
